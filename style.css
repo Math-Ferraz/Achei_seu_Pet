@@ -94,23 +94,31 @@ h1, h2, h3 {
 }
 
 /* Navegação por Abas */
+/* Navegação por Abas */
 .tabs-nav {
   display: flex;
   background-color: var(--tab-nav-bg);
-  padding: 6px;
+  padding: 4px;
   border-radius: var(--radius-full);
   margin: 16px 0 24px 0;
   gap: 4px;
   border: 1px solid var(--tab-nav-border);
   box-shadow: var(--shadow-soft);
+  overflow-x: auto; /* Permite rolar se necessário */
+  scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
+}
+
+.tabs-nav::-webkit-scrollbar {
+  display: none; /* Esconde barra de rolagem no Chrome/Safari */
 }
 
 .tab-btn {
   flex: 1;
+  white-space: nowrap; /* Evita quebras desnecessárias */
   border: none;
   background: transparent;
-  padding: 12px 16px;
-  font-size: 0.9rem;
+  padding: 10px 12px;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-body);
   border-radius: var(--radius-full);
@@ -120,6 +128,7 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  text-align: center;
 }
 
 .tab-btn:hover {
@@ -132,13 +141,24 @@ h1, h2, h3 {
   box-shadow: 0 2px 8px rgba(255, 107, 87, 0.3);
 }
 
-/* Conteúdo das Abas */
-.tab-content {
-  display: none;
-}
+/* Regras específicas para celulares */
+@media (max-width: 480px) {
+  .tabs-nav {
+    padding: 3px;
+    gap: 2px;
+  }
 
-.tab-content.active {
-  display: block;
+  .tab-btn {
+    padding: 8px 8px;
+    font-size: 0.75rem; /* Fonte levemente menor no celular */
+    line-height: 1.2;
+  }
+
+  /* Oculta os ícones pequenos nas abas no celular para economizar espaço */
+  .tab-btn svg, 
+  .tab-btn i {
+    display: none;
+  }
 }
 
 .intro-card {
