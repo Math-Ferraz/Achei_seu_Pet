@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>PataPerto - Tag para Coleira (Impressão)</title>
+
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Externo de Impressão -->
+  <link rel="stylesheet" href="imprimir_tag.css">
+</head>
+<body>
+
+  <div class="no-print-bar">
+    <h2>Imprimir Etiquetas de Coleira - PataPerto</h2>
+    <p>Ajuste as configurações da sua impressora para <strong>Escala: 100% (Tamanho Real)</strong>.</p>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir Etiquetas</button>
+  </div>
+
+  <div class="page-a4">
+
+    <!-- TAG 1: 30x30 mm (Pequena) -->
+    <div class="tag-card tag-30x30">
+      <div class="hole-punch"></div>
+      <div class="tag-qr">
+        <img src="" alt="QR Code">
+      </div>
+      <span class="tag-pet-name">PET</span>
+    </div>
+
+    <!-- TAG 2: 40x40 mm (Média) -->
+    <div class="tag-card tag-40x40">
+      <div class="hole-punch"></div>
+      <span class="tag-brand">PataPerto</span>
+      <div class="tag-qr">
+        <img src="" alt="QR Code">
+      </div>
+      <span class="tag-pet-name">PET</span>
+    </div>
+
+    <!-- TAG 3: 30x50 mm (Vertical / Pingente) -->
+    <div class="tag-card tag-30x50">
+      <div class="hole-punch"></div>
+      <span class="tag-brand">PataPerto</span>
+      <div class="tag-qr">
+        <img src="" alt="QR Code">
+      </div>
+      <span class="tag-pet-name">PET</span>
+      <span style="font-size: 5pt; color: #104F55;">ESCANEE-ME</span>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const petName = urlParams.get('pet') || 'SEU PET';
+      const qrData = urlParams.get('qr') || 'https://pataperto.app';
+
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+
+      // Atualiza os nomes nos modelos de tag
+      document.querySelectorAll('.tag-pet-name').forEach(el => {
+        el.textContent = petName.toUpperCase();
+      });
+
+      // Atualiza as imagens do QR Code
+      document.querySelectorAll('.tag-qr img').forEach(img => {
+        img.src = qrImageUrl;
+      });
+    });
+  </script>
+</body>
+</html>

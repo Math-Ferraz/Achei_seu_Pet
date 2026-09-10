@@ -1,0 +1,169 @@
+/* ==========================================
+   Estilos Globais e de Visualização na Tela
+   ========================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #F3F4F6;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Barra Superior Fixa (Não sai na impressão) */
+.no-print-bar {
+  background: #FFFFFF;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.no-print-bar h2 {
+  font-family: 'Nunito', sans-serif;
+  color: #104F55;
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.no-print-bar p {
+  color: #607274;
+  font-size: 0.9rem;
+}
+
+.btn-print {
+  background-color: #FF6B57;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-print:hover {
+  background-color: #e05845;
+}
+
+/* ==========================================
+   Folha A4 e Modelos de Tags
+   ========================================== */
+.page-a4 {
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 15mm;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10mm;
+  align-content: flex-start;
+}
+
+.tag-card {
+  border: 1px dashed #CCC;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4mm;
+  background: #FFF9F2;
+  border-radius: 4mm;
+  page-break-inside: avoid;
+}
+
+/* Tamanho 1: Pequeno (30x30 mm) - Gatos / Pets Pequenos */
+.tag-30x30 {
+  width: 30mm;
+  height: 30mm;
+}
+
+/* Tamanho 2: Médio (40x40 mm) - Cães Médios */
+.tag-40x40 {
+  width: 40mm;
+  height: 40mm;
+}
+
+/* Tamanho 3: Pingente / Retangular (30x50 mm) */
+.tag-30x50 {
+  width: 30mm;
+  height: 50mm;
+}
+
+/* Indicador do Furo da Argola */
+.hole-punch {
+  width: 3.5mm;
+  height: 3.5mm;
+  border: 1px solid #FF6B57;
+  border-radius: 50%;
+  background: white;
+}
+
+.tag-brand {
+  font-family: 'Nunito', sans-serif;
+  color: #104F55;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tag-30x30 .tag-brand { font-size: 6pt; }
+.tag-40x40 .tag-brand { font-size: 8pt; }
+.tag-30x50 .tag-brand { font-size: 8pt; }
+
+.tag-qr {
+  background: white;
+  padding: 1mm;
+  border-radius: 1mm;
+  border: 1px solid #EFE4D6;
+}
+
+.tag-30x30 .tag-qr img { width: 16mm; height: 16mm; }
+.tag-40x40 .tag-qr img { width: 24mm; height: 24mm; }
+.tag-30x50 .tag-qr img { width: 22mm; height: 22mm; }
+
+.tag-pet-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: #FF6B57;
+  text-transform: uppercase;
+}
+
+.tag-30x30 .tag-pet-name { font-size: 6pt; }
+.tag-40x40 .tag-pet-name { font-size: 9pt; }
+.tag-30x50 .tag-pet-name { font-size: 8pt; }
+
+/* ==========================================
+   Regras Exclusivas para Impressão
+   ========================================== */
+@media print {
+  body {
+    background: none;
+    padding: 0;
+  }
+  
+  .no-print-bar {
+    display: none !important;
+  }
+  
+  .page-a4 {
+    box-shadow: none;
+    width: 100%;
+    height: 100%;
+    padding: 10mm;
+  }
+  
+  .tag-card {
+    border: 1px solid #000; /* Borda contínua para guiar o corte com tesoura/estilete */
+  }
+}

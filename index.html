@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etiqueta Pet - Localizador e Identificação</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS (Mapa) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  
+  <!-- Arquivo de Estilos Personalizado -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Container de Notificação / Toast -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Cabeçalho -->
+  <header class="main-header">
+  <div class="container header-content">
+    <div class="logo">
+      <div class="logo-icon">
+        <!-- Ícone de Patinha -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-5 1c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7.5 5c-1.93 0-3.5 1.57-3.5 3.5S7.57 21 9.5 21s3.5-1.57 3.5-3.5S11.43 16 9.5 16zm5 0c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5z"/></svg>
+      </div>
+      <div class="logo-text">
+        <h1>PataPerto</h1>
+        <p>achou um pet? escaneie a etiqueta da coleira</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+  <main class="main-content container">
+    <!-- Abas de Navegação -->
+    <nav class="tabs-nav" aria-label="Menu principal">
+      <button class="tab-btn active" data-tab="cadastrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Cadastrar meu pet
+      </button>
+      <button class="tab-btn" data-tab="encontrei">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Encontrei um pet
+      </button>
+      <button class="tab-btn" data-tab="acompanhar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+        Acompanhar meu pet
+      </button>
+    </nav>
+
+    <!-- ABA 1: CADASTRAR MEU PET -->
+    <section id="tab-cadastrar" class="tab-content active">
+      <div class="intro-card">
+        <p>Cadastre seu pet para gerar uma etiqueta com QR Code. Imprima e cole na coleira — se ele se perder, quem encontrar poderá ler o código e falar com você na hora.</p>
+      </div>
+
+      <div class="card form-card">
+        <form id="form-cadastrar">
+          <div class="form-group">
+            <label for="cad-nome-dono">Seu nome</label>
+            <input type="text" id="cad-nome-dono" placeholder="Maria Silva" required>
+          </div>
+
+          <div class="form-group">
+            <label for="cad-nome-pet">Nome do pet</label>
+            <input type="text" id="cad-nome-pet" placeholder="Rex" required>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="cad-email">E-mail</label>
+              <input type="email" id="cad-email" placeholder="maria@email.com" required>
+            </div>
+            <div class="form-group">
+              <label for="cad-telefone">Telefone / WhatsApp</label>
+              <input type="tel" id="cad-telefone" placeholder="(11) 99999-0000" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="2"/><rect width="4" height="4" x="7" y="7"/><rect width="4" height="4" x="13" y="7"/><rect width="4" height="4" x="7" y="13"/><rect width="4" height="4" x="13" y="13"/></svg>
+            Gerar etiqueta e QR Code
+          </button>
+        </form>
+      </div>
+
+      <!-- Área de resultado após o cadastro -->
+      <div id="resultado-qr" class="card result-card hidden">
+        <div class="badge-success">Etiqueta Criada com Sucesso!</div>
+        <h3>Coleira de <span id="res-pet-nome">Rex</span></h3>
+        <p class="subtitle">Este é o QR Code que você deve anexar à coleira do seu pet:</p>
+
+        <div class="qrcode-wrapper">
+          <img id="qr-image" src="" alt="QR Code do Pet">
+        </div>
+
+        <div class="action-buttons">
+          <button id="btn-download-qr" class="btn btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            Baixar Imagem do QR Code
+          </button>
+          <button id="btn-simular-leitura" class="btn btn-accent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/></svg>
+            Simular Escaneamento
+          </button>
+        </div>
+      </div>
+
+      <div class="privacy-note">
+        Os dados cadastrados (nome, e-mail e telefone) ficam salvos vinculados ao código da etiqueta e são visíveis para qualquer pessoa que tenha esse código — como acontece com uma etiqueta física na coleira.
+      </div>
+    </section>
+
+    <!-- ABA 2: ENCONTREI UM PET -->
+    <section id="tab-encontrei" class="tab-content">
+      <div class="card pet-found-card">
+        <div class="alert-banner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+          <span>Você encontrou um pet perdido! Entre em contato com o responsável abaixo.</span>
+        </div>
+
+        <div class="pet-header">
+          <div class="pet-avatar">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2 .333-3 1.5-3 3.5 0 3 2.5 4 4.5 4a3.5 3.5 0 0 0 2-5.328Z"/><path d="M14 5.172C14 3.782 15.577 2.679 17.5 3c2 .333 3 1.5 3 3.5 0 3-2.5 4-4.5 4a3.5 3.5 0 0 1-2-5.328Z"/><path d="M12 14c2.5 0 7 1.5 7 5v2H5v-2c0-3.5 4.5-5 7-5Z"/><circle cx="12" cy="11" r="3"/></svg>
+          </div>
+          <div class="pet-info-header">
+            <h2 id="view-pet-nome">Rex</h2>
+            <p class="owner-name">Responsável: <strong id="view-dono-nome">Maria Silva</strong></p>
+          </div>
+        </div>
+
+        <div class="contact-actions-grid">
+          <a href="#" id="link-whats" target="_blank" class="btn btn-whatsapp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Chamar no WhatsApp
+          </a>
+          <a href="#" id="link-tel" class="btn btn-phone">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Ligar para o Dono
+          </a>
+          <a href="#" id="link-email" class="btn btn-outline">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            Enviar E-mail
+          </a>
+        </div>
+
+        <hr class="divider">
+
+        <div class="map-section">
+          <h3>Marcar Localização de Encontro</h3>
+          <p class="subtitle">Ajude o tutor a saber exatamente onde o pet está agora:</p>
+
+          <button id="btn-obter-gps" class="btn btn-gps btn-block">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 2 15 8 12 14 9 8 12 2"/></svg>
+            Compartilhar minha localização atual (GPS)
+          </button>
+
+          <div id="map-container" class="map-box"></div>
+          <p class="map-hint">* Você também pode clicar no mapa acima para ajustar a posição do pino.</p>
+
+          <div class="form-group margin-top">
+            <label for="obs-encontro">Observação ou ponto de referência (opcional)</label>
+            <textarea id="obs-encontro" rows="2" placeholder="Ex: Está no portão da praça principal, perto do quiosque."></textarea>
+          </div>
+
+          <button id="btn-enviar-localizacao" class="btn btn-accent btn-block">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Enviar localização para o dono
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 3: ACOMPANHAR MEU PET -->
+    <section id="tab-acompanhar" class="tab-content">
+      <div class="card">
+        <h3>Histórico de Avistamentos</h3>
+        <p class="subtitle">Veja os locais onde o seu pet foi localizado após escanearem o QR Code:</p>
+
+        <div id="lista-avistamentos" class="avistamentos-list">
+          <!-- Inserido dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="main-footer">
+    <div class="container">
+      <p>Etiqueta Pet &copy; 2026 - Conectando e protegendo animais de estimação.</p>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS (Mapa) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Arquivo JS Principal -->
+  <script src="script.js"></script>
+</body>
+</html>
