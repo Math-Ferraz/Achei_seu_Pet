@@ -1,3 +1,18 @@
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyB5LkCPwirn7MedK1Ixw2P1iIYmY_Fgn0g",
+  authDomain: "acheiseupet-366a8.firebaseapp.com",
+  projectId: "acheiseupet-366a8",
+  storageBucket: "acheiseupet-366a8.firebasestorage.app",
+  messagingSenderId: "86746319105",
+  appId: "1:86746319105:web:b7301c8141276cb42d3300"
+};
+
+// Inicializa o Firebase e o Firestore Database
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+
 // Estado da Aplicação
 let currentPet = null;
 let selectedCoords = { lat: -23.55052, lng: -46.633308 }; // Padrão SP
@@ -236,37 +251,69 @@ function obterGPS() {
 
 // Enviar Localização para o Dono
 function enviarLocalizacao() {
+  if (!currentPet) {
+    showToast('Nenhum pet selecionado.');
+    return;
+  }
+
   const obs = document.getElementById('obs-encontro').value.trim();
+
   const avistamento = {
-    id: Date.now(),
-    petName: currentPet ? currentPet.nomePet : 'Pet',
+    petName: currentPet.nomePet,
     data: new Date().toLocaleString('pt-BR'),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     coords: selectedCoords,
     obs: obs
   };
 
-  saveAvistamento(avistamento);
-  showToast('Localização enviada ao tutor com sucesso!');
-  document.getElementById('obs-encontro').value = '';
-}
-
-// Salvar no Histórico
-function saveAvistamento(item) {
-  let list = JSON.parse(localStorage.getItem('etiqueta_pet_avistamentos') || '[]');
-  list.unshift(item);
-  localStorage.setItem('etiqueta_pet_avistamentos', JSON.stringify(list));
-  loadAvistamentos();
+  // Salva direto no banco de dados Firebase na nuvem
+  db.collection("avistamentos").add(avistamento)
+    .then(() => {
+      showToast('Localização enviada ao tutor com sucesso!');
+      document.getElementById('obs-encontro').value = '';
+    })
+    .catch((error) => {
+      console.error("Erro ao salvar localização: ", error);
+      showToast('Erro ao enviar localização. Tente novamente.');
+    });
 }
 
 // Carregar Histórico
 function loadAvistamentos() {
+  // Mantendo o mesmo ID 'lista-avistamentos' do seu HTML
   const container = document.getElementById('lista-avistamentos');
-  const list = JSON.parse(localStorage.getItem('etiqueta_pet_avistamentos') || '[]');
+  if (!container) return;
 
-  if (list.length === 0) {
-    container.innerHTML = '<p class="subtitle">Nenhum avistamento registrado até o momento.</p>';
-    return;
-  }
+  db.collection("avistamentos")
+    .orderBy("timestamp", "desc")
+    .onSnapshot((querySnapshot) => {
+      container.innerHTML = '';
+
+      if (querySnapshot.empty) {
+        container.innerHTML = '<p class="subtitle">Nenhum avistamento registrado até o momento.</p>';
+        return;
+      }
+
+      querySnapshot.forEach((doc) => {
+        const item = doc.data();
+        const card = document.createElement('div');
+        card.className = 'avistamento-card';
+        card.innerHTML = `
+          <div class="avistamento-header">
+            ⏰ ${item.data || ''}
+          </div>
+          <div class="avistamento-body">
+            <strong>${item.petName || 'Pet'}</strong> foi visto perto das coordenadas:<br>
+            <small>Lat: ${item.coords ? item.coords.lat.toFixed(5) : ''}, Lng: ${item.coords ? item.coords.lng.toFixed(5) : ''}</small>
+            ${item.obs ? `<div class="avistamento-obs">💬 "${item.obs}"</div>` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }, (error) => {
+      console.error("Erro ao carregar avistamentos: ", error);
+    });
+}
 
   container.innerHTML = list.map(item => `
     <div class="avistamento-item">
@@ -278,7 +325,6 @@ function loadAvistamentos() {
       ${item.obs ? `<div class="avistamento-obs">💬 "${item.obs}"</div>` : ''}
     </div>
   `).join('');
-}
 
 // Exibir Notificação Toast
 function showToast(message) {
