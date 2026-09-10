@@ -78,6 +78,7 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(255, 107, 87, 0.3);
+  flex-shrink: 0;
 }
 
 .logo-text h1 {
@@ -93,8 +94,9 @@ h1, h2, h3 {
   margin-top: 2px;
 }
 
-/* Navegação por Abas */
-/* Navegação por Abas */
+/* ==========================================
+   NAVEGAÇÃO POR ABAS E ESCONDER CONTEÚDO
+   ========================================== */
 .tabs-nav {
   display: flex;
   background-color: var(--tab-nav-bg);
@@ -104,20 +106,20 @@ h1, h2, h3 {
   gap: 4px;
   border: 1px solid var(--tab-nav-border);
   box-shadow: var(--shadow-soft);
-  overflow-x: auto; /* Permite rolar se necessário */
-  scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .tabs-nav::-webkit-scrollbar {
-  display: none; /* Esconde barra de rolagem no Chrome/Safari */
+  display: none;
 }
 
 .tab-btn {
   flex: 1;
-  white-space: nowrap; /* Evita quebras desnecessárias */
+  white-space: nowrap;
   border: none;
   background: transparent;
-  padding: 10px 12px;
+  padding: 10px 14px;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-body);
@@ -141,26 +143,17 @@ h1, h2, h3 {
   box-shadow: 0 2px 8px rgba(255, 107, 87, 0.3);
 }
 
-/* Regras específicas para celulares */
-@media (max-width: 480px) {
-  .tabs-nav {
-    padding: 3px;
-    gap: 2px;
-  }
-
-  .tab-btn {
-    padding: 8px 8px;
-    font-size: 0.75rem; /* Fonte levemente menor no celular */
-    line-height: 1.2;
-  }
-
-  /* Oculta os ícones pequenos nas abas no celular para economizar espaço */
-  .tab-btn svg, 
-  .tab-btn i {
-    display: none;
-  }
+/* REGRA CRÍTICA: Esconde todas as abas por padrão */
+.tab-content {
+  display: none !important;
 }
 
+/* REGRA CRÍTICA: Exibe APENAS a aba com a classe .active */
+.tab-content.active {
+  display: block !important;
+}
+
+/* Conteúdo interno */
 .intro-card {
   margin-bottom: 20px;
   color: var(--text-body);
@@ -452,8 +445,27 @@ h1, h2, h3 {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* ==========================================
+   REGRAS DE RESPONSIVIDADE (CELULAR)
+   ========================================== */
 @media (max-width: 480px) {
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tabs-nav {
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .tab-btn {
+    padding: 8px 6px;
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+
+  .tab-btn svg, 
+  .tab-btn i {
+    display: none;
   }
 }
