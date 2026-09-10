@@ -67,7 +67,7 @@ function initFormCadastro() {
   });
 }
 
-// Exibir QR Code Gerado
+// Exibir QR Code Gerado e criar o link completo com os dados
 function exibirResultadoQR(pet) {
   const resultCard = document.getElementById('resultado-qr');
   const petNomeSpan = document.getElementById('res-pet-nome');
@@ -75,15 +75,25 @@ function exibirResultadoQR(pet) {
 
   petNomeSpan.textContent = pet.nomePet;
 
-  // Link único do pet para o QR Code
-  const currentUrl = window.location.href.split('?')[0];
-  const qrTargetUrl = `${currentUrl}?petId=${pet.id}`;
+  // Pega o link base do site na Vercel
+  const baseUrl = window.location.origin + window.location.pathname;
 
-  // Gerar a URL da imagem do QR Code
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrTargetUrl)}`;
+  // Codifica os dados do pet direto nos parâmetros da URL
+  const params = new URLSearchParams({
+    pet: pet.nomePet,
+    dono: pet.dono,
+    tel: pet.telefone,
+    email: pet.email
+  });
+
+  // Link final que o QR Code vai abrir
+  const qrTargetUrl = `${baseUrl}?${params.toString()}`;
+
+  // Gera o QR Code com a URL completa contendo as informações
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrTargetUrl)}`;
   qrImg.src = qrImageUrl;
 
-  // Atualizar ou criar o botão de impressão para abrir a página de tags
+  // Botão para abrir a folha de impressão
   let btnImprimir = document.getElementById('btn-imprimir-tag');
   if (!btnImprimir) {
     btnImprimir = document.createElement('button');
@@ -91,12 +101,9 @@ function exibirResultadoQR(pet) {
     btnImprimir.className = 'btn btn-primary btn-block';
     btnImprimir.style.marginTop = '10px';
     btnImprimir.innerHTML = '🖨️ Imprimir Tags para Coleira';
-    
-    // Adiciona o botão na área de ações do resultado
     document.querySelector('.action-buttons').appendChild(btnImprimir);
   }
 
-  // Ao clicar, abre a página de impressão passando o nome do pet e o link do QR Code via URL
   btnImprimir.onclick = () => {
     const printUrl = `imprimir_tag.html?pet=${encodeURIComponent(pet.nomePet)}&qr=${encodeURIComponent(qrTargetUrl)}`;
     window.open(printUrl, '_blank');
@@ -105,16 +112,6 @@ function exibirResultadoQR(pet) {
   resultCard.classList.remove('hidden');
   resultCard.scrollIntoView({ behavior: 'smooth' });
 }
-
-  // URL que será embutida no QR Code (inclui parâmetro de busca pelo ID do pet)
-  const currentUrl = window.location.href.split('?')[0];
-  const qrTargetUrl = `${currentUrl}?petId=${pet.id}`;
-
-  // Usando API pública para gerar a imagem do QR Code
-  qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrTargetUrl)}`;
-
-  resultCard.classList.remove('hidden');
-  resultCard.scrollIntoView({ behavior: 'smooth' });
 
 // Baixar QR Code
 function baixarQRCode() {
@@ -129,18 +126,28 @@ function baixarQRCode() {
   document.body.removeChild(link);
 }
 
-// Verificar se veio de uma leitura de QR Code (Parâmetros da URL)
+// Ler a URL assim que a página carrega e abrir direto os dados do Pet
 function checkUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
-  const petId = urlParams.get('petId');
+  const petNome = urlParams.get('pet');
+  const donoNome = urlParams.get('dono');
+  const telefone = urlParams.get('tel');
+  const email = urlParams.get('email');
 
-  if (petId) {
-    const saved = localStorage.getItem('etiqueta_pet_data');
-    if (saved) {
-      const pet = JSON.parse(saved);
-      carregarDadosNoEncontrei(pet);
-      switchTab('encontrei');
-    }
+  // Se a URL contiver os dados do pet (veio do escaneamento do QR Code)
+  if (petNome && donoNome && telefone) {
+    const petData = {
+      nomePet: petNome,
+      dono: donoNome,
+      telefone: telefone,
+      email: email || ''
+    };
+
+    // Preenche a tela de visualização
+    carregarDadosNoEncontrei(petData);
+
+    // Muda automaticamente para a aba "Encontrei um pet"
+    switchTab('encontrei');
   }
 }
 
