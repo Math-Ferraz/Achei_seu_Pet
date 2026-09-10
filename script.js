@@ -17,23 +17,43 @@ document.addEventListener('DOMContentLoaded', () => {
 function initTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
   tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const tabTarget = btn.getAttribute('data-tab');
       switchTab(tabTarget);
     });
   });
+
+  // Se houver parâmetros na URL (QR Code), o checkUrlParams vai cuidar da aba.
+  // Caso contrário, ativa a primeira aba corretamente.
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.get('pet')) {
+    switchTab('cadastrar');
+  }
 }
 
 function switchTab(tabId) {
+  // 1. Remove classe ativa dos botões
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  
+  // 2. Esconde TODAS as seções de abas explicitamente via Style e remove a classe active
+  document.querySelectorAll('.tab-content').forEach(c => {
+    c.classList.remove('active');
+    c.style.display = 'none';
+  });
 
+  // 3. Ativa o botão selecionado
   const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-  const activeContent = document.getElementById(`tab-${tabId}`);
-
   if (activeBtn) activeBtn.classList.add('active');
-  if (activeContent) activeContent.classList.add('active');
 
+  // 4. Exibe APENAS a seção alvo
+  const activeContent = document.getElementById(`tab-${tabId}`);
+  if (activeContent) {
+    activeContent.classList.add('active');
+    activeContent.style.display = 'block';
+  }
+
+  // Recarrega o mapa se for a aba do pet encontrado
   if (tabId === 'encontrei' && map) {
     setTimeout(() => { map.invalidateSize(); }, 200);
   }
